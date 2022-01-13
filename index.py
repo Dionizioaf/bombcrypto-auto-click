@@ -49,6 +49,7 @@ config = yaml.safe_load(stream)
 config_threshold = config['threshold']
 config_telegram = config['telegram']
 discord_config = config['discord']
+multiaccount_config = config['multiaccount']
 
 # Load telegram config file and set
 TELEGRAM_BOT_TOKEN = config_telegram['token']
@@ -890,6 +891,7 @@ def main():
 
             ProcessingAccount= True
             SendToWorkOnce = False
+            PrintGainOne = False
             SleepCounter = 0
 
             while ProcessingAccount == True:
@@ -979,15 +981,18 @@ def main():
                         if now - last["BCoins_in_chest"] > add_randomness(intervals['interval_between_bcoins_chest'] * 60):
                             last["BCoins_in_chest"] = now
                             get_total_bcoins()
+                            PrintGainOne= True
+                            if SleepCounter==multiaccount_config['waitcycles']:
+                                last["refresh_heroes"]=0
 
                         # sleep for the heroes refresh time to save processing
                         t = 60  # seconds of delay
                         inform('Nothing to do. Delay of ' + str(t) + 's to keep proccessing.', msg_type='success')
                         time.sleep(t)
-                    if SendToWorkOnce == True:
+                    if SendToWorkOnce == True and PrintGainOne == True:
                         ProcessingAccount= False
                     else:
-                        if SleepCounter==4:
+                        if SleepCounter==multiaccount_config['waitcycles']:
                             last["refresh_heroes"]=0
                         SleepCounter=SleepCounter+1
 
