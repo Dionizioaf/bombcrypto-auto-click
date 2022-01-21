@@ -1,21 +1,29 @@
 ---
 
   # Matamask password
-  metamask_password: 'YOUR METAMASK PASSWORD HERE'
+  # metamask_password: 'YOUR METAMASK PASSWORD HERE'
+
+  multiaccount:
+    waitcycles: 4
+  # Ativar caso precise de proxy para comunicar o Telegram
+  proxy:
+    enable: True
+    # Proxy IP
+    server: 'http://10.255.21.19:128'
 
   # Time intervals configuration
   time_intervals:
     # Time interval for check if there are available heroes to work
     # Default value (in minutes): 10
-    send_heroes_for_work: 10
+    send_heroes_for_work: 3
 
     # Time interval to update heroes position in the map,
     # Default value (in minutes): 3
-    refresh_heroes_positions: 3
+    refresh_heroes_positions: 5
 
     # Time interval to check for login request
     # Default value (in minutes): 5
-    check_for_login: 5
+    check_for_login: 3
 
     # Time interval to detect freeze in some screen
     # Default value (in minutes): 5
@@ -67,7 +75,14 @@
 
   # Telegram bot config
   telegram:
-    enabled: False
-    token: 'YOUR TOKEN HERE'
-    chat_id: 'YOUR CHAT ID HERE'
-
+    enabled: True
+    token: '5034165231:AAF0zUU8KZrJK8o4KkF0KDoxIJnIJptrOnA'
+    token_brave: '5034165231:AAF0zUU8KZrJK8o4KkF0KDoxIJnIJptrOnA' #NFT2
+    token_firefox: '5051279188:AAEqq_nqWHD0JmDOSodi2Ag8qm7OBLh2nEU' #NFT0
+    token_chrome: '5069299084:AAHU9Jqn9NOUlPuw-IDPRTtmBkfwCGFT2C8' #NFT1
+    chat_id: '729522981'
+    chat_id_2: '766192347'
+  discord:
+    enabled: True
+    token: 'OTI2NTkzNDgyNjI0MjA4OTk2.Yc97bQ.W2vNMeGwU4X1HBX82kDrRAj6Vms'
+    channel: 926549197774266438
