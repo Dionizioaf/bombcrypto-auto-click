@@ -11,6 +11,10 @@
       name: 'notebook_regi',
       Browser: 'firefox'
     }]
+  connection:
+    proxyEnabled: False
+    proxyServer: 'http://IP:PORTA'
+
   multiaccount:
     waitcycles: 4
   # Time intervals configuration

@@ -57,6 +57,14 @@ send_to_work_clicks = 0
 login_attempts = 0
 new_map_available = False
 
+#connection
+connectionConfig = config['connection']
+proxyEnabled = connectionConfig['proxyEnabled']
+proxyServer = {
+    'http': connectionConfig['proxyServer'],
+    'https': connectionConfig['proxyServer']
+}
+
 # Wallet Ids
 config_accounts = config['accounts']
 Walleturl = config_accounts['Walleturl']
@@ -109,7 +117,10 @@ def send_wallet_info(browser,module,content):
             "metodo": module,
             "valor": content
         }
-        requests.put(Walleturl + "api/bombbot", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']), data = contentPut)
+        if (proxyEnabled == True):
+            requests.put(Walleturl + "api/bombbot", proxies=proxyServer, auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']), data = contentPut)
+        else:
+            requests.put(Walleturl + "api/bombbot", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']), data = contentPut)
     except:
         inform('Falha ao enviar dados para o servidor','error');
 
@@ -123,7 +134,10 @@ def send_wallet_image(browser,module,content):
         files=[
         ('multipleFiles',('bcoin.png',open(content,'rb'),'image/png'))
         ]
-        requests.put(Walleturl + "api/" + module + "_image", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']),  data=payload, files=files)
+        if (proxyEnabled == True):
+            requests.put(Walleturl + "api/" + module + "_image", proxies=proxyServer, auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']),  data=payload, files=files)
+        else :
+            requests.put(Walleturl + "api/" + module + "_image", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']),  data=payload, files=files)
     except:
         inform('Falha ao enviar imagem para o servidor','error');
     
