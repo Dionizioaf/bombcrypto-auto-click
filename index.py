@@ -8,7 +8,7 @@ import os
 from cv2 import cv2
 from colorama import Fore
 import datetime as dt
-
+import requests
 from captcha.solveCaptcha import solveCaptcha
 
 from os import listdir
@@ -21,10 +21,6 @@ import time
 import sys
 
 import yaml
-
-
-import telegram
-from discord.ext import commands,tasks
 
 import logging
 logging.basicConfig(level=logging.ERROR,
@@ -47,33 +43,7 @@ config = yaml.safe_load(stream)
 
 # Config headers
 config_threshold = config['threshold']
-config_telegram = config['telegram']
-discord_config = config['discord']
 multiaccount_config = config['multiaccount']
-
-# Load telegram config file and set
-TELEGRAM_BOT_TOKEN = config_telegram['token']
-# TELEGRAM_BOT_TOKEN_BRAVE = config_telegram['token_brave']
-# TELEGRAM_BOT_TOKEN_FIREFOX = config_telegram['token_firefox']
-# TELEGRAM_BOT_TOKEN_CHROME = config_telegram['token_chrome']
-TELEGRAM_CHAT_ID = config_telegram['chat_id']
-TELEGRAM_CHAT_ID2 = config_telegram['chat_id_2']
-
-# Initiate telegram bot
-# bot_brave = telegram.Bot(token=TELEGRAM_BOT_TOKEN_BRAVE)
-# bot_firefox = telegram.Bot(token=TELEGRAM_BOT_TOKEN_FIREFOX)
-# bot_chrome = telegram.Bot(token=TELEGRAM_BOT_TOKEN_CHROME)
-pp = telegram.utils.request.Request(proxy_url='http://10.255.21.19:128')
-bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN,request=pp)
-
-# Discord Helper
-
-Discord_message_list= ['iniciado']
-discordbot = commands.Bot("!!")
-
-@discordbot.event
-async def on_ready():
-    print(f"Estou pronto! Estou conectado como {bot.user}")
 
 # HELPER
 current_account = 'brave'
@@ -86,7 +56,15 @@ pyautogui.FAILSAFE = False
 send_to_work_clicks = 0
 login_attempts = 0
 new_map_available = False
-#last_screen_found = 0
+
+# Wallet Ids
+config_accounts = config['accounts']
+Walleturl = config_accounts['Walleturl']
+WalletStatus = config_accounts['WalletEnable']
+MultiAccount = config_accounts['multiAccount']
+Accounts = config_accounts['Account']
+
+
 
 """ 
 =================================
@@ -108,120 +86,29 @@ def inform(msg: str, msg_type: str):
     # print
     print(colors[msg_type] + '(' + dt.datetime.now().strftime('%H:%M:%S') + ') ' + msg)
 
-    # telegram send
-    if config_telegram['enabled']:
-        print('Send Telegram')
-        # send telegram msg if enabled in config
-        telegram_bot_send_text(msg)
-        telegram_bot_send_text(msg,0,2)
-        discord_send_message(msg)
-
     # forces to “flush” terminal buffer
     sys.stdout.flush()
 
 
 """
 ---------------------
-Telegram bot send text
+App sync Data
 ---------------------
 """
 
-
-def telegram_bot_send_text(bot_message, num_try=0,dest=1):
-    global bot
-    print(current_account)
-    try:
-        if dest == 1:
-            return bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=bot_message)
-        else:
-            return bot.send_message(chat_id=TELEGRAM_CHAT_ID2, text=bot_message) 
-        # if current_account == 'brave':
-        #     bot_brave = telegram.Bot(token=TELEGRAM_BOT_TOKEN_BRAVE)
-        #     if dest == 1:
-        #         return bot_brave.send_message(chat_id=TELEGRAM_CHAT_ID, text=bot_message)
-        #     else:
-        #         return bot_brave.send_message(chat_id=TELEGRAM_CHAT_ID2, text=bot_message)
-        # if current_account == 'firefox':
-        #     if dest == 1:
-        #         return bot_firefox.send_message(chat_id=TELEGRAM_CHAT_ID, text=bot_message)
-        #     else:
-        #         return bot_firefox.send_message(chat_id=TELEGRAM_CHAT_ID2, text=bot_message)
-        # if current_account == 'chrome':
-        #     if dest == 1:
-        #         return bot_chrome.send_message(chat_id=TELEGRAM_CHAT_ID, text=bot_message)
-        #     else:
-        #         return bot_chrome.send_message(chat_id=TELEGRAM_CHAT_ID2, text=bot_message)
-       
-    except:
-        if num_try == 1:
-            bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-            return telegram_bot_send_text(bot_message)
-        return 0
-
-
-"""
----------------------
-Telegram bot send photo
----------------------
-"""
-
-
-def telegram_bot_send_photo(photo_path, num_try=0,dest=1):
-    global bot,bot_chrome,bot_brave,bot_firefox,current_account
-    try:
-        if dest == 1:
-            return bot.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=open(photo_path, "rb"))
-        else:
-            return bot.send_photo(chat_id=TELEGRAM_CHAT_ID2, photo=open(photo_path, "rb"))
-        # if current_account == 'brave':
-        #     if dest == 1:
-        #         return bot_brave.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=open(photo_path, "rb"))
-        #     else:
-        #         return bot_brave.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=open(photo_path, "rb"))
-        # if current_account == 'firefox':
-        #     if dest == 1:
-        #         return bot_firefox.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=open(photo_path, "rb"))
-        #     else:
-        #         return bot_firefox.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=open(photo_path, "rb"))
-        # if current_account == 'chrome':
-        #     if dest == 1:
-        #         return bot_chrome.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=open(photo_path, "rb"))
-        #     else:
-        #         return bot_chrome.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=open(photo_path, "rb"))
-       # return bot.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=open(photo_path, "rb"))
-    except:
-        if num_try == 1:
-            bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-            return telegram_bot_send_photo(photo_path)
-        return 0
-
-
-
-"""
----------------------
-Discord bot send photo
----------------------
-"""
-
-def discord_send_message(msg):
-    Discord_message_list.append(msg)
-    return 0
-
-
-
-"""
----------------------
-Discord Runner
----------------------
-"""
-
-@tasks.loop(seconds=10)
-async def process_discord_messages():
-    global Discord_message_list
-    channel = discordbot.get_channel(discord_config['channel'])
-    if Discord_message_list[0] != '':
-        await channel.send(Discord_message_list[0])
-        Discord_message_list.pop(0)
+def send_wallet_info(browser,module,content):
+    AccountIndex = -1
+    for index, element in enumerate(Accounts):
+        if element["Browser"] == browser:
+            AccountIndex = index
+    
+    print(AccountIndex)
+    print(Accounts[AccountIndex])
+    contentPut = {
+        "metodo": module,
+        "valor": content
+    }
+    requests.put(Walleturl + "api/bombbot", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']), data = contentPut)
 
 
 
@@ -473,6 +360,7 @@ def click_green_bar_buttons():
     inform('%d green bars detected' % len(green_bars), msg_type='log')
     buttons = positions(images['go-work'], threshold=config_threshold['go_to_work_btn'])
     inform('%d buttons detected' % len(buttons), msg_type='log')
+    send_wallet_info(current_account,'stamina','%d buttons detected' % len(buttons))
 
     not_working_green_bars = []
     for bar in green_bars:
@@ -604,10 +492,6 @@ def get_total_bcoins():
     time.sleep(2)
     # inform BCoins
     inform("🪙 BCoins in chest - screen printed.", msg_type='log')
-    # send photo in telegram
-    if config_telegram['enabled']:
-        telegram_bot_send_photo(img_dir)
-        telegram_bot_send_photo(img_dir,0,2)
     # close window
     click_btn(images['x'])
 
@@ -657,6 +541,7 @@ def connect_wallet():
     # Click in wallet button
     if click_btn(images['connect-wallet'], name='connectWalletBtn', timeout=10):
         inform('Connect wallet button detected, logging in!', msg_type='log')
+        send_wallet_info(current_account,'login','')
 
     time.sleep(1)
 
@@ -740,39 +625,9 @@ def refresh_heroes():
         scroll()
         time.sleep(2)
     inform('{} heroes sent to work'.format(send_to_work_clicks), msg_type='log')
+    send_wallet_info(current_account,'work','{} heroes sent to work'.format(send_to_work_clicks))
     go_to_game()
 
-
-"""
-Send printscreen via telegram bot
-"""
-
-
-def send_printscreen_to_telegram():
-    # if telegram is enabled:
-    if config_telegram['enabled']:
-
-        # take screenshot of game area
-        back_button = positions(images['corner'], threshold=config_threshold['default'])
-
-        # from the bcoin image calculates the area of the square for print
-        xx, yy, aa, bb = back_button[0]
-        x_init = xx + 10
-        y_init = yy - 20
-        img_lenght = 1030
-        img_height = 690
-
-        # take screenshot
-        my_screen = pyautogui.screenshot(region=(x_init, y_init, img_lenght, img_height))
-        # save image
-        img_dir = os.path.dirname(os.path.realpath(__file__)) + r'\tmp\printscreen.png'
-        my_screen.save(img_dir)
-        # delau
-        time.sleep(2)
-        # send image in telegram
-        if config_telegram['enabled']:
-            telegram_bot_send_photo(img_dir)
-            telegram_bot_send_photo(img_dir,0,2)
 
 
 """
@@ -847,7 +702,7 @@ MAIN function
 """
 
 def main():
-    global current_account, last_screen_found, new_map_available
+    global current_account, new_map_available
     time.sleep(5)
     windows = []
 
@@ -861,8 +716,6 @@ def main():
             "refresh_heroes" : 0,
             "BCoins_in_chest": 0
             })
-
-    inform(str(windows),'info')
 
     while True:
         for last in windows:
@@ -934,6 +787,7 @@ def main():
 
                 # 4 = main page
                 elif screen == 4:
+                    send_wallet_info(current_account,'heroes','')
                     if now - last["heroes"] >= add_randomness(intervals['send_heroes_for_work'] * 60):
                         last["heroes"] = now
                         # open heroes page

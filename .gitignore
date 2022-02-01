@@ -10,7 +10,7 @@ test.py
 /tmp/*.png
 
 # User Config
-config.yaml
+#config.yaml
 
 # cache
 /src/__pycache__

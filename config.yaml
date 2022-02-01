@@ -1,7 +1,23 @@
 ---
+  accounts:
+    #Wallet APP
+    WalletEnable: true
+    Walleturl: 'http://192.168.64.1:3000/'
 
-  # Matamask password
-  # metamask_password: 'YOUR METAMASK PASSWORD HERE'
+    #Generic Config
+    multiAccount: false
+    Account: [{
+      id: '48865012-47a6-4a31-b082-af84e7150988',
+      name: 'notebook_regi',
+      Browser: 'firefox'
+    }]
+
+
+
+
+
+
+  
 
   multiaccount:
     waitcycles: 4
