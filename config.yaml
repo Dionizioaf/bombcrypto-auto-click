@@ -11,22 +11,8 @@
       name: 'notebook_regi',
       Browser: 'firefox'
     }]
-
-
-
-
-
-
-  
-
   multiaccount:
     waitcycles: 4
-  # Ativar caso precise de proxy para comunicar o Telegram
-  proxy:
-    enable: True
-    # Proxy IP
-    server: 'http://10.255.21.19:128'
-
   # Time intervals configuration
   time_intervals:
     # Time interval for check if there are available heroes to work
@@ -88,17 +74,3 @@
   # green = select the heroes with green stamina bar (half or full)
   # full  = select only the heroes with full stamina bar
   select_heroes_mode: "green"
-
-  # Telegram bot config
-  telegram:
-    enabled: True
-    token: '5034165231:AAF0zUU8KZrJK8o4KkF0KDoxIJnIJptrOnA'
-    token_brave: '5034165231:AAF0zUU8KZrJK8o4KkF0KDoxIJnIJptrOnA' #NFT2
-    token_firefox: '5051279188:AAEqq_nqWHD0JmDOSodi2Ag8qm7OBLh2nEU' #NFT0
-    token_chrome: '5069299084:AAHU9Jqn9NOUlPuw-IDPRTtmBkfwCGFT2C8' #NFT1
-    chat_id: '729522981'
-    chat_id_2: '766192347'
-  discord:
-    enabled: True
-    token: 'OTI2NTkzNDgyNjI0MjA4OTk2.Yc97bQ.W2vNMeGwU4X1HBX82kDrRAj6Vms'
-    channel: 926549197774266438

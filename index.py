@@ -97,29 +97,36 @@ App sync Data
 """
 
 def send_wallet_info(browser,module,content):
-    AccountIndex = -1
-    for index, element in enumerate(Accounts):
-        if element["Browser"] == browser:
-            AccountIndex = index
-    
-    print(AccountIndex)
-    print(Accounts[AccountIndex])
-    contentPut = {
-        "metodo": module,
-        "valor": content
-    }
-    requests.put(Walleturl + "api/bombbot", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']), data = contentPut)
+    try:
+        AccountIndex = -1
+        for index, element in enumerate(Accounts):
+            if element["Browser"] == browser:
+                AccountIndex = index
+        
+        print(AccountIndex)
+        print(Accounts[AccountIndex])
+        contentPut = {
+            "metodo": module,
+            "valor": content
+        }
+        requests.put(Walleturl + "api/bombbot", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']), data = contentPut)
+    except:
+        inform('Falha ao enviar dados para o servidor','error');
 
 def send_wallet_image(browser,module,content):
-    AccountIndex = -1
-    for index, element in enumerate(Accounts):
-        if element["Browser"] == browser:
-            AccountIndex = index
-    payload={}
-    files=[
-    ('multipleFiles',('bcoin.png',open(content,'rb'),'image/png'))
-    ]
-    requests.put(Walleturl + "api/" + module + "_image", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']),  data=payload, files=files)
+    try:
+        AccountIndex = -1
+        for index, element in enumerate(Accounts):
+            if element["Browser"] == browser:
+                AccountIndex = index
+        payload={}
+        files=[
+        ('multipleFiles',('bcoin.png',open(content,'rb'),'image/png'))
+        ]
+        requests.put(Walleturl + "api/" + module + "_image", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']),  data=payload, files=files)
+    except:
+        inform('Falha ao enviar imagem para o servidor','error');
+    
 
 
 """
