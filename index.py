@@ -110,6 +110,16 @@ def send_wallet_info(browser,module,content):
     }
     requests.put(Walleturl + "api/bombbot", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']), data = contentPut)
 
+def send_wallet_image(browser,module,content):
+    AccountIndex = -1
+    for index, element in enumerate(Accounts):
+        if element["Browser"] == browser:
+            AccountIndex = index
+    payload={}
+    files=[
+    ('multipleFiles',('bcoin.png',open(content,'rb'),'image/png'))
+    ]
+    requests.put(Walleturl + "api/" + module + "_image", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']),  data=payload, files=files)
 
 
 """
@@ -488,6 +498,8 @@ def get_total_bcoins():
     my_screen = pyautogui.screenshot(region=(k, l, m, n))
     img_dir = os.path.dirname(os.path.realpath(__file__)) + r'\tmp\bcoins.png'
     my_screen.save(img_dir)
+    send_wallet_image(current_account,'bcoin',img_dir)   
+
     # Delay
     time.sleep(2)
     # inform BCoins

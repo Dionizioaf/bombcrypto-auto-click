@@ -1,14 +1,15 @@
 import requests
- 
-# Making a P
-# UT request
-myfiles = {'file': open('address.png' ,'rb')}
-r = requests.put('http://localhost:3000/api/image_bombbot', auth=("notebook_regi", "48865012-47a6-4a31-b082-af84e7150988"), files = myfiles)
- 
-# check status code for response received
-# success code - 200
-print(r)
- 
-# print content 
-# of request
-print(r.content)
+
+url = "http://192.168.64.1:3000/api/bcoin_image"
+
+payload={}
+files=[
+  ('multipleFiles',('cmd.png',open('address.png','rb'),'image/png'))
+]
+headers = {
+  'Authorization': 'Basic bm90ZWJvb2tfcmVnaTo0ODg2NTAxMi00N2E2LTRhMzEtYjA4Mi1hZjg0ZTcxNTA5ODg='
+}
+
+response = requests.request("PUT", url, headers=headers, data=payload, files=files)
+
+print(response.text)
