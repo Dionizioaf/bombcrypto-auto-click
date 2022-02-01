@@ -2,7 +2,7 @@
   accounts:
     #Wallet APP
     WalletEnable: true
-    Walleturl: 'http://192.168.64.1:3000/'
+    Walleturl: 'https://bomb-wallet.herokuapp.com/'
 
     #Generic Config
     multiAccount: false
