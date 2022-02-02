@@ -1,0 +1,1 @@
+python3 forever.py python3 index.py

@@ -2,8 +2,9 @@
 from subprocess import Popen
 import sys
 
-filename = sys.argv[1]
+pyversion = sys.argv[1]
+filename = sys.argv[2]
 while True:
     print("\nStarting " + filename)
-    p = Popen("python " + filename, shell=True)
+    p = Popen(pyversion + " " + filename, shell=True)
     p.wait()

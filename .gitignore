@@ -7,8 +7,9 @@
 test.py
 
 # tmp
-/tmp/*.png
-
+# /tmp/*.png
+tmp/bcoins.png
+tmp/printscreen.png
 # User Config
 #config.yaml
 

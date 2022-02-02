@@ -4,6 +4,8 @@ Fork of https://github.com/mpcabete/bombcrypto-bot
 """
 
 import os
+import platform
+OSWin = True if platform.system() == "Windows" else False
 
 from cv2 import cv2
 from colorama import Fore
@@ -13,7 +15,9 @@ from captcha.solveCaptcha import solveCaptcha
 
 from os import listdir
 from random import random
-import pygetwindow
+
+if OSWin == True:
+    import pygetwindow
 import numpy as np
 import mss
 import pyautogui
@@ -69,7 +73,7 @@ proxyServer = {
 config_accounts = config['accounts']
 Walleturl = config_accounts['Walleturl']
 WalletStatus = config_accounts['WalletEnable']
-MultiAccount = config_accounts['multiAccount']
+MultiAccount = config_accounts['multiAccount'] if OSWin == True else False
 Accounts = config_accounts['Account']
 
 
@@ -141,6 +145,11 @@ def send_wallet_image(browser,module,content):
     except:
         inform('Falha ao enviar imagem para o servidor','error');
     
+def send_print_screen_to_app():
+    generate_printscreen()
+    time.sleep(5)
+    send_wallet_info(current_account,'screen',os.path.dirname(os.path.realpath(__file__)) + r'\tmp\printscreen.png')
+    time.sleep(5)
 
 
 """
@@ -207,6 +216,27 @@ def load_images():
 
 images = load_images()
 
+
+def generate_printscreen():
+
+    # take screenshot of game area
+    back_button = positions(images['corner'], threshold=config_threshold['default'])
+
+    # from the bcoin image calculates the area of the square for print
+    xx, yy, aa, bb = back_button[0]
+    x_init = xx + 10
+    y_init = yy - 20
+    img_lenght = 1030
+    img_height = 690
+
+    # take screenshot
+    my_screen = pyautogui.screenshot(region=(x_init, y_init, img_lenght, img_height))
+    # save image
+    img_dir = os.path.dirname(os.path.realpath(__file__)) + r'\tmp\printscreen.png'
+    my_screen.save(img_dir)
+    # delau
+    time.sleep(2)
+    
 """
 ---------------------
 Show function
@@ -244,6 +274,7 @@ def click_btn(img, name=None, timeout=3, threshold=config_threshold['default']):
         # print('waiting for "{}" button, timeout of {}s'.format(name, timeout))
     start = time.time()
     clicked = False
+    print('Aqui 1')
     while not clicked:
         matches = positions(img, threshold=threshold)
         if len(matches) == 0:
@@ -738,38 +769,57 @@ def main():
     global current_account, new_map_available
     time.sleep(5)
     windows = []
-
-    for w in pygetwindow.getWindowsWithTitle('Bombcrypto'):
+    if OSWin == True:
+        for w in pygetwindow.getWindowsWithTitle('Bombcrypto'):
+            windows.append({
+                "window": w,
+                "login" : 0,
+                "heroes" : 0,
+                "new_map" : 0,
+                "check_for_captcha" : 0,
+                "refresh_heroes" : 0,
+                "BCoins_in_chest": 0
+                })
+    else:
         windows.append({
-            "window": w,
+            "window": [{
+                "title": Accounts[0]['Browser']
+            }],
             "login" : 0,
             "heroes" : 0,
             "new_map" : 0,
             "check_for_captcha" : 0,
             "refresh_heroes" : 0,
             "BCoins_in_chest": 0
-            })
+        })
 
     while True:
         for last in windows:
             try:
                 last["window"].activate()
-                last_screen_found = 0
             except:
                 inform('***  Encontramos problemas para trocar as janelas.','info')
             
-            if 'Brave' in last["window"].title:
-                current_account = 'brave'
-                inform('========================','info')
-                inform('Changing account - NFT02 [Navegador Brave]','info')
-            if 'Firefox' in last["window"].title:
-                current_account = 'firefox'
-                inform('========================','info')
-                inform('Changing account - NFT00 [Navegador Firefox]','info')
-            if 'Chrome' in last["window"].title:
-                current_account = 'chrome'
-                inform('========================','info')
-                inform('Changing account - NFT01 [Navegador Chrome]','info')
+            last_screen_found = 0
+
+            if OSWin == True:
+                if 'Brave' in last["window"].title:
+                    current_account = 'brave'
+                    inform('========================','info')
+                    inform('Changing account - NFT02 [Navegador Brave]','info')
+                if 'Firefox' in last["window"].title:
+                    current_account = 'firefox'
+                    inform('========================','info')
+                    inform('Changing account - NFT00 [Navegador Firefox]','info')
+                if 'Chrome' in last["window"].title:
+                    current_account = 'chrome'
+                    inform('========================','info')
+                    inform('Changing account - NFT01 [Navegador Chrome]','info')
+                if 'Chromium' in last["window"].title:
+                    current_account = 'chromium'
+                    inform('========================','info')
+            else:
+                current_account = Accounts[0]['Browser']
             time.sleep(5)
             
             intervals = config['time_intervals']
@@ -791,11 +841,18 @@ def main():
                 if screen == 0:
                     # Check if freezes
                     if now - last_screen_found >= add_randomness(intervals['check_freeze'] * 60):
+                        print('1')
+                        # Update last found screen
+                        last_screen_found = now
+                        # Call connect_wallet function
+                        connect_wallet()
+                    elif last_screen_found == 0:
                         # Update last found screen
                         last_screen_found = now
                         # Call connect_wallet function
                         connect_wallet()
                     else:
+                        print('2')
                         # Nothing found and in freeze time wait
                         time.sleep(1)
                         continue
@@ -845,7 +902,7 @@ def main():
                         inform('🗺️ New map opened! Printing screen.', msg_type='success')
                         # Send print to telegram
                         try:
-                            send_printscreen_to_telegram()
+                            send_print_screen_to_app()
                         except:
                             inform('Error generating print screen.','info')
                         # unset
@@ -889,7 +946,7 @@ def main():
                     inform('⚠ Some error occurred. Clicking ok.', msg_type='error')
                     # Send print to telegram
                     try:
-                        send_printscreen_to_telegram()
+                        send_print_screen_to_app()
                     except:
                         inform('Error generating print screen.','info')
                     # Click OK button (game error)

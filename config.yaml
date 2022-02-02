@@ -5,11 +5,11 @@
     Walleturl: 'https://bomb-wallet.herokuapp.com/'
 
     #Generic Config
-    multiAccount: false
+    multiAccount: False
     Account: [{
-      id: '48865012-47a6-4a31-b082-af84e7150988',
-      name: 'notebook_regi',
-      Browser: 'firefox'
+      id: '747d6320-18a3-4ff7-8930-bc4ba47137db',
+      name: 'Santos0001',
+      Browser: 'chromium'
     }]
   connection:
     proxyEnabled: False
@@ -33,7 +33,7 @@
 
     # Time interval to detect freeze in some screen
     # Default value (in minutes): 5
-    check_freeze: 5
+    check_freeze: 2
 
     # Time interval between moviments
     # Default value (in seconds): 1
@@ -52,7 +52,7 @@
     commom: 0.8
 
     # Default value: 0.8
-    select_wallet_buttons: 0.8
+    select_wallet_buttons: 0.1
 
     # Default value: 0.90
     go_to_work_btn: 0.90
