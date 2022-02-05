@@ -97,7 +97,8 @@ def inform(msg: str, msg_type: str):
     }
     # print
     print(colors[msg_type] + '(' + dt.datetime.now().strftime('%H:%M:%S') + ') ' + msg)
-
+    if msg_type != "log" and msg_type !=  "info":
+        send_wallet_info(current_account,'log',msg, msg_type)
     # forces to “flush” terminal buffer
     sys.stdout.flush()
 
@@ -108,25 +109,26 @@ App sync Data
 ---------------------
 """
 
-def send_wallet_info(browser,module,content):
+def send_wallet_info(browser,module,content,extra = ''):
     try:
         AccountIndex = -1
         for index, element in enumerate(Accounts):
             if element["Browser"] == browser:
                 AccountIndex = index
         
-        print(AccountIndex)
-        print(Accounts[AccountIndex])
         contentPut = {
             "metodo": module,
-            "valor": content
+            "valor": content,
+            "kind": extra
         }
+
+        
         if (proxyEnabled == True):
             requests.put(Walleturl + "api/bombbot", proxies=proxyServer, auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']), data = contentPut)
         else:
             requests.put(Walleturl + "api/bombbot", auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']), data = contentPut)
-    except:
-        inform('Falha ao enviar dados para o servidor','error');
+    except Exception as e:
+	    print("ERROR : "+str(e))
 
 def send_wallet_image(browser,module,content):
     try:
@@ -136,7 +138,7 @@ def send_wallet_image(browser,module,content):
                 AccountIndex = index
         payload={}
         files=[
-        ('multipleFiles',('bcoin.png',open(content,'rb'),'image/png'))
+        ('multipleFiles',(module + '.png',open(content,'rb'),'image/png'))
         ]
         if (proxyEnabled == True):
             requests.put(Walleturl + "api/" + module + "_image", proxies=proxyServer, auth=(Accounts[AccountIndex]['name'], Accounts[AccountIndex]['id']),  data=payload, files=files)
@@ -148,7 +150,7 @@ def send_wallet_image(browser,module,content):
 def send_print_screen_to_app():
     generate_printscreen()
     time.sleep(5)
-    send_wallet_info(current_account,'screen',os.path.dirname(os.path.realpath(__file__)) + r'\tmp\printscreen.png')
+    send_wallet_image(current_account,'printscreen',os.path.dirname(os.path.realpath(__file__)) + r'\tmp\printscreen.png')
     time.sleep(5)
 
 
@@ -274,7 +276,6 @@ def click_btn(img, name=None, timeout=3, threshold=config_threshold['default']):
         # print('waiting for "{}" button, timeout of {}s'.format(name, timeout))
     start = time.time()
     clicked = False
-    print('Aqui 1')
     while not clicked:
         matches = positions(img, threshold=threshold)
         if len(matches) == 0:
@@ -625,6 +626,9 @@ def metamask_sign_in():
     # Portuguese button text
     elif click_btn(images['select-wallet-2-pt'], name='select-wallet-2-pt', timeout=10, threshold=config_threshold['select_wallet_buttons']):
         inform('Metamask button found [PT]. Sign in.', msg_type='log')
+    
+    elif click_btn(images['select-wallet-3-pt'], name='select-wallet-3-pt', timeout=10, threshold=config_threshold['select_wallet_buttons']):
+        inform('Metamask button found [PT]. Sign in.', msg_type='log')
 
 
 """
@@ -648,6 +652,34 @@ def metamask_login():
     # Portuguese button text
     elif click_btn(images['metamask-unlock-pt'], name='select-wallet-2-pt', timeout=10, threshold=config_threshold['select_wallet_buttons']):
         inform('Metamask login button found [PT]. Send password.', msg_type='log')
+
+
+"""
+---------------------
+Close Metamask Windows when it is behind the browser
+---------------------
+"""
+
+def closeMetaMaskWindows():
+    send_print_screen_to_app()
+    if OSWin == True:
+        Metamask = []
+        CountMMWindow = 1;
+        while CountMMWindow > 0:
+            for w in pygetwindow.getWindowsWithTitle('MetaMask'):
+                Metamask.append({
+                    "Metamask": w
+                })
+            CountMMWindow = len(Metamask)
+            for last in Metamask:
+                last["Metamask"].activate()
+                time.sleep(3)
+                metamask_login()
+    else:
+        #Alert possible Metamask Window
+        inform('Verify if there is not any metamask window behin browser', 'warn')
+
+
 
 
 """
@@ -714,7 +746,7 @@ Return:
 
 def find_screen():
     # DO NOT CHANGE THE ORDER ABOVE (PRIORITY).
-
+    
     # 9 = matamask login
     if (len(positions(images['metamask-unlock-en'], threshold=0.90)) > 0) or \
             (len(positions(images['metamask-unlock-pt'], threshold=0.90)) > 0):
@@ -829,6 +861,7 @@ def main():
             SendToWorkOnce = False
             PrintGainOne = False
             SleepCounter = 0
+            MetaMaskStuck = 0
 
             while ProcessingAccount == True:
                 # get now time
@@ -837,22 +870,28 @@ def main():
                 # Find screen number
                 screen = find_screen()
                 inform('Current screen: '+ str(screen),"info")
+
+                if MetaMaskStuck >= 2:
+                    #Limpa Metamask
+                    closeMetaMaskWindows()
+
                 # 0 = no screen defined
                 if screen == 0:
+                    
                     # Check if freezes
                     if now - last_screen_found >= add_randomness(intervals['check_freeze'] * 60):
-                        print('1')
                         # Update last found screen
                         last_screen_found = now
                         # Call connect_wallet function
                         connect_wallet()
+                        
                     elif last_screen_found == 0:
                         # Update last found screen
                         last_screen_found = now
                         # Call connect_wallet function
                         connect_wallet()
+                        
                     else:
-                        print('2')
                         # Nothing found and in freeze time wait
                         time.sleep(1)
                         continue
@@ -863,6 +902,7 @@ def main():
                         last["login"] = now
                         # Call connect_wallet function
                         connect_wallet()
+                        
 
                 # 2 = captcha
                 elif screen == 2:
@@ -874,9 +914,11 @@ def main():
                 # 3 = metamask
                 elif screen == 3:
                     metamask_sign_in()
+                    MetaMaskStuck = MetaMaskStuck + 1
 
                 # 4 = main page
                 elif screen == 4:
+                    MetaMaskStuck = 0
                     send_wallet_info(current_account,'heroes','')
                     if now - last["heroes"] >= add_randomness(intervals['send_heroes_for_work'] * 60):
                         last["heroes"] = now
