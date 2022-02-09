@@ -5,12 +5,14 @@
     Walleturl: 'https://bomb-wallet.herokuapp.com/'
 
     #Generic Config
-    multiAccount: False
+    # single, multi-browser, multi-extension
+    multiAccount: 'single'
     Account: [{
       id: '747d6320-18a3-4ff7-8930-bc4ba47137db',
       name: 'Santos0001',
       Browser: 'chromium'
     }]
+
   connection:
     proxyEnabled: False
     proxyServer: 'http://IP:PORTA'

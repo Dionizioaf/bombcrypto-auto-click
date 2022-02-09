@@ -1,8 +1,3 @@
-"""
-coding: utf-8
-Fork of https://github.com/mpcabete/bombcrypto-bot
-"""
-
 import os
 import platform
 OSWin = True if platform.system() == "Windows" else False
@@ -32,10 +27,9 @@ logging.basicConfig(level=logging.ERROR,
 
 welcome = """
 -------------------------------------------------------------------
-Fork of https://github.com/mpcabete/bombcrypto-bot
-
 >>---> Press ctrl + c to kill the bot.
 >>---> Some configs can be fount in the config.yaml file.
+>>---> You can generate the config file in https://redcryptowallet.com
 -------------------------------------------------------------------
 """
 
@@ -73,7 +67,7 @@ proxyServer = {
 config_accounts = config['accounts']
 Walleturl = config_accounts['Walleturl']
 WalletStatus = config_accounts['WalletEnable']
-MultiAccount = config_accounts['multiAccount'] if OSWin == True else False
+MultiAccount = config_accounts['multiAccount'] if OSWin == True else 'single'
 Accounts = config_accounts['Account']
 
 
@@ -109,11 +103,11 @@ App sync Data
 ---------------------
 """
 
-def send_wallet_info(browser,module,content,extra = ''):
+def send_wallet_info(curAccount,module,content,extra = ''):
     try:
         AccountIndex = -1
         for index, element in enumerate(Accounts):
-            if element["Browser"] == browser:
+            if element["id"] == curAccount:
                 AccountIndex = index
         
         contentPut = {
@@ -130,11 +124,11 @@ def send_wallet_info(browser,module,content,extra = ''):
     except Exception as e:
 	    print("ERROR : "+str(e))
 
-def send_wallet_image(browser,module,content):
+def send_wallet_image(curAccount,module,content):
     try:
         AccountIndex = -1
         for index, element in enumerate(Accounts):
-            if element["Browser"] == browser:
+            if element["id"] == curAccount:
                 AccountIndex = index
         payload={}
         files=[
@@ -217,6 +211,18 @@ def load_images():
 
 
 images = load_images()
+
+def load_images_account_ext():
+    file_names = listdir('./accounts_ext/')
+    targets = {}
+    for file in file_names:
+        path = 'accounts_ext/' + file
+        targets[remove_suffix(file, '.png')] = cv2.imread(path)
+
+    return targets
+
+
+images_accounts_ext = load_images_account_ext()
 
 
 def generate_printscreen():
@@ -725,6 +731,45 @@ def refresh_heroes():
     go_to_game()
 
 
+"""
+---------------------
+Update Current Account variable
+---------------------
+"""
+
+def find_current_account(window):
+    global current_account
+
+    if MultiAccount == 'single' or OSWin == False:
+        current_account = Accounts[0].id
+        inform('Account Selected: ','info')
+        inform(Accounts[0],'info')
+    elif MultiAccount == 'multi-browser':
+        browser = ''
+        if 'Brave' in window["window"].title:
+            browser = 'brave'
+        if 'Firefox' in window["window"].title:
+            browser = 'firefox'
+        if 'Chrome' in window["window"].title:
+            browser = 'chrome'
+        if 'Chromium' in window["window"].title:
+            browser = 'chromium'
+            
+        
+        for index, element in enumerate(Accounts):
+            if element["Browser"] == browser:
+                current_account = element["id"]
+                inform('Account Selected: ','info')
+                inform(element,'info')
+
+    elif MultiAccount == 'multi-extension':
+        for index, element in enumerate(Accounts):
+            if len(positions(images_accounts_ext[element["name"]], threshold=config_threshold['default'])) > 0:
+                current_account = element["id"]
+                inform('Account Selected: ','info')
+                inform(element,'info')
+
+
 
 """
 ---------------------
@@ -801,7 +846,8 @@ def main():
     global current_account, new_map_available
     time.sleep(5)
     windows = []
-    if OSWin == True:
+    #If its windows and Account type is not single
+    if OSWin == True and MultiAccount != 'single':
         for w in pygetwindow.getWindowsWithTitle('Bombcrypto'):
             windows.append({
                 "window": w,
@@ -812,6 +858,7 @@ def main():
                 "refresh_heroes" : 0,
                 "BCoins_in_chest": 0
                 })
+    # if its not windows or account is Single
     else:
         windows.append({
             "window": [{
@@ -825,6 +872,7 @@ def main():
             "BCoins_in_chest": 0
         })
 
+
     while True:
         for last in windows:
             try:
@@ -833,25 +881,27 @@ def main():
                 inform('***  Encontramos problemas para trocar as janelas.','info')
             
             last_screen_found = 0
+            
+            find_current_account(last);
 
-            if OSWin == True:
-                if 'Brave' in last["window"].title:
-                    current_account = 'brave'
-                    inform('========================','info')
-                    inform('Changing account - NFT02 [Navegador Brave]','info')
-                if 'Firefox' in last["window"].title:
-                    current_account = 'firefox'
-                    inform('========================','info')
-                    inform('Changing account - NFT00 [Navegador Firefox]','info')
-                if 'Chrome' in last["window"].title:
-                    current_account = 'chrome'
-                    inform('========================','info')
-                    inform('Changing account - NFT01 [Navegador Chrome]','info')
-                if 'Chromium' in last["window"].title:
-                    current_account = 'chromium'
-                    inform('========================','info')
-            else:
-                current_account = Accounts[0]['Browser']
+            # if OSWin == True:
+            #     if 'Brave' in last["window"].title:
+            #         current_account = 'brave'
+            #         inform('========================','info')
+            #         inform('Changing account - NFT02 [Navegador Brave]','info')
+            #     if 'Firefox' in last["window"].title:
+            #         current_account = 'firefox'
+            #         inform('========================','info')
+            #         inform('Changing account - NFT00 [Navegador Firefox]','info')
+            #     if 'Chrome' in last["window"].title:
+            #         current_account = 'chrome'
+            #         inform('========================','info')
+            #         inform('Changing account - NFT01 [Navegador Chrome]','info')
+            #     if 'Chromium' in last["window"].title:
+            #         current_account = 'chromium'
+            #         inform('========================','info')
+            # else:
+            #     current_account = Accounts[0]['Browser']
             time.sleep(5)
             
             intervals = config['time_intervals']
