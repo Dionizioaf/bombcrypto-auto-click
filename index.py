@@ -741,9 +741,9 @@ def find_current_account(window):
     global current_account
 
     if MultiAccount == 'single' or OSWin == False:
-        current_account = Accounts[0].id
+        current_account = Accounts[0]['id']
         inform('Account Selected: ','info')
-        inform(Accounts[0],'info')
+        inform(str(Accounts[0]),'info')
     elif MultiAccount == 'multi-browser':
         browser = ''
         if 'Brave' in window["window"].title:
@@ -760,14 +760,14 @@ def find_current_account(window):
             if element["Browser"] == browser:
                 current_account = element["id"]
                 inform('Account Selected: ','info')
-                inform(element,'info')
+                inform(str(element),'info')
 
     elif MultiAccount == 'multi-extension':
         for index, element in enumerate(Accounts):
             if len(positions(images_accounts_ext[element["name"]], threshold=config_threshold['default'])) > 0:
                 current_account = element["id"]
                 inform('Account Selected: ','info')
-                inform(element,'info')
+                inform(str(element),'info')
 
 
 
