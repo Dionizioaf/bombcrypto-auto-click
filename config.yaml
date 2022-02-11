@@ -54,7 +54,7 @@
     commom: 0.8
 
     # Default value: 0.8
-    select_wallet_buttons: 0.1
+    select_wallet_buttons: 0.8
 
     # Default value: 0.90
     go_to_work_btn: 0.90
