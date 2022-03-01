@@ -810,7 +810,12 @@ def find_screen():
     if (len(positions(images['select-wallet-2-en'], threshold=0.90)) > 0) or \
             (len(positions(images['select-wallet-2-pt'], threshold=0.90)) > 0):
         return 3
-
+    if (len(positions(images['select-wallet-2-pt'], threshold=0.90)) > 0) or \
+            (len(positions(images['select-wallet-3-pt'], threshold=0.90)) > 0):
+        return 3
+    if (len(positions(images['select-wallet-3-pt'], threshold=0.90)) > 0) or \
+            (len(positions(images['select-wallet-2-pt'], threshold=0.90)) > 0):
+        return 3
     # 7 = error popup
     elif (len(positions(images['ok'], threshold=config_threshold['default'])) > 0) or \
             (len(positions(images['ok-firefox'], threshold=config_threshold['default'])) > 0):
@@ -897,24 +902,6 @@ def main():
             
             find_current_account(last);
 
-            # if OSWin == True:
-            #     if 'Brave' in last["window"].title:
-            #         current_account = 'brave'
-            #         inform('========================','info')
-            #         inform('Changing account - NFT02 [Navegador Brave]','info')
-            #     if 'Firefox' in last["window"].title:
-            #         current_account = 'firefox'
-            #         inform('========================','info')
-            #         inform('Changing account - NFT00 [Navegador Firefox]','info')
-            #     if 'Chrome' in last["window"].title:
-            #         current_account = 'chrome'
-            #         inform('========================','info')
-            #         inform('Changing account - NFT01 [Navegador Chrome]','info')
-            #     if 'Chromium' in last["window"].title:
-            #         current_account = 'chromium'
-            #         inform('========================','info')
-            # else:
-            #     current_account = Accounts[0]['Browser']
             time.sleep(5)
             
             intervals = config['time_intervals']
@@ -977,11 +964,11 @@ def main():
                 # 3 = metamask
                 elif screen == 3:
                     metamask_sign_in()
-                    MetaMaskStuck = MetaMaskStuck + 1
+                    
 
                 # 4 = main page
                 elif screen == 4:
-                    MetaMaskStuck = 0
+                    
                     send_wallet_info(current_account,'heroes','')
                     if now - last["heroes"] >= add_randomness(intervals['send_heroes_for_work'] * 60):
                         last["heroes"] = now
