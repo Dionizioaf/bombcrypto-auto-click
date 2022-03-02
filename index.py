@@ -641,9 +641,6 @@ def metamask_sign_in():
     # Portuguese button text
     elif click_btn(images['select-wallet-2-pt'], name='select-wallet-2-pt', timeout=10, threshold=config_threshold['select_wallet_buttons']):
         inform('Metamask button found [PT]. Sign in.', msg_type='log')
-    
-    elif click_btn(images['select-wallet-3-pt'], name='select-wallet-3-pt', timeout=10, threshold=config_threshold['select_wallet_buttons']):
-        inform('Metamask button found [PT]. Sign in.', msg_type='log')
 
 
 """
@@ -807,15 +804,11 @@ def find_screen():
         return 9
 
     # 3 = metamask wallet
-    if (len(positions(images['select-wallet-2-en'], threshold=0.90)) > 0) or \
-            (len(positions(images['select-wallet-2-pt'], threshold=0.90)) > 0):
+    if (len(positions(images['select-wallet-2-en'], threshold=0.90)) > 0):
         return 3
-    if (len(positions(images['select-wallet-2-pt'], threshold=0.90)) > 0) or \
-            (len(positions(images['select-wallet-3-pt'], threshold=0.90)) > 0):
+    if (len(positions(images['select-wallet-2-pt'], threshold=0.90)) > 0):
         return 3
-    if (len(positions(images['select-wallet-3-pt'], threshold=0.90)) > 0) or \
-            (len(positions(images['select-wallet-2-pt'], threshold=0.90)) > 0):
-        return 3
+
     # 7 = error popup
     elif (len(positions(images['ok'], threshold=config_threshold['default'])) > 0) or \
             (len(positions(images['ok-firefox'], threshold=config_threshold['default'])) > 0):
