@@ -6,5 +6,5 @@ pyversion = sys.argv[1]
 filename = sys.argv[2]
 while True:
     print("\nStarting " + filename)
-    p = Popen(pyversion + " " + filename, shell=True)
+    p = Popen("python" + " " + filename, shell=True)
     p.wait()

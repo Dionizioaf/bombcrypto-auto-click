@@ -144,7 +144,7 @@ def send_wallet_image(curAccount,module,content):
 def send_print_screen_to_app():
     generate_printscreen()
     time.sleep(5)
-    send_wallet_image(current_account,'printscreen',os.path.dirname(os.path.realpath(__file__)) + r'\tmp\printscreen.png')
+    send_wallet_image(current_account,'printscreen',os.path.dirname(os.path.realpath(__file__)) + r'\print\printscreen.png')
     time.sleep(5)
 
 
@@ -240,7 +240,7 @@ def generate_printscreen():
     # take screenshot
     my_screen = pyautogui.screenshot(region=(x_init, y_init, img_lenght, img_height))
     # save image
-    img_dir = os.path.dirname(os.path.realpath(__file__)) + r'\tmp\printscreen.png'
+    img_dir = os.path.dirname(os.path.realpath(__file__)) + r'\print\printscreen.png'
     my_screen.save(img_dir)
     # delau
     time.sleep(2)
@@ -555,7 +555,7 @@ def get_total_bcoins():
 
     # take screenshot
     my_screen = pyautogui.screenshot(region=(k, l, m, n))
-    img_dir = os.path.dirname(os.path.realpath(__file__)) + r'\tmp\bcoins.png'
+    img_dir = os.path.dirname(os.path.realpath(__file__)) + r'\print\bcoins.png'
     my_screen.save(img_dir)
     send_wallet_image(current_account,'bcoin',img_dir)   
 

@@ -8,13 +8,28 @@
     # single, multi-browser, multi-extension
     multiAccount: 'single'
     Account: [{
-      id: '747d6320-18a3-4ff7-8930-bc4ba47137db',
-      name: 'Santos0001',
-      Browser: 'chromium'
+      id: 'UUID',
+      name: 'AccountName',
+      Browser: 'chrome'
     }]
+  # {
+  #     id: 'f21ac39e-f7c5-4963-afdf-3ed4cb382a4b',
+  #     name: 'NFT0001-Firefox',
+  #     Browser: 'firefox'
+  #   },
+  #   {
+  #     id: 'e6de00ba-81e3-4206-a611-04022c68b797',
+  #     name: 'NFT0002-Chrome',
+  #     Browser: 'chrome'
+  #   },
+  #   {
+  #     id: '76712f7d-24f3-441b-aa65-e50dabe344b7',
+  #     name: 'NFT0003-Brave',
+  #     Browser: 'brave'
+  #   }
 
   connection:
-    proxyEnabled: False
+    proxyEnabled: false
     proxyServer: 'http://IP:PORTA'
 
   multiaccount:
